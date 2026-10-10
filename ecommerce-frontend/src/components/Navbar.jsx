@@ -3,19 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.jpeg"
 import { getCategories } from "../services/categoryService";
+import { clearAuthData } from "../services/authService";
+import { useCart } from "./CartContext";
 
-function Navbar(){
+function Navbar({ isLoggedIn, setIsLoggedIn }){
     const navigate = useNavigate();
-    const [isLoggedIn,setLoggedIn]  = useState(
-        !!localStorage.getItem("token")
-    );
+    const { cartCount } = useCart();
+
+    const [search,setSearch] = useState("");
+        
+    const handleSearch = (e)=>{
+        e.preventDefault();
+    const value= search.trim();
+
+    if(!value){
+        navigate("/products");
+        return;
+    }
+    navigate(`/products?search=${encodeURIComponent(value)}`);
+}
 
     const handleLogout = ()=>{
-        localStorage.removeItem("token");
-        localStorage.removeItem("username")
-        localStorage.removeItem("user")
-
-        setLoggedIn(false);
+        clearAuthData();
+        setIsLoggedIn(false);
         navigate("/login");
     }
 
@@ -136,15 +146,27 @@ function Navbar(){
             </ul>
 
                 <div className="flex items-center gap-4">
-                    <input 
-                    type="text"
-                    placeholder="search products..."
-                    className="hidden rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none md:block"
-                    />
+                    <form onSubmit={handleSearch}>
+                        <input 
+                            type="text"
+                            placeholder="search products..."
+                            className="hidden rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none md:block"
+                            onChange={(e)=>setSearch(e.target.value)}
+                        />
+                    </form>
 
-                    <button className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                        🛒Cart
-                    </button>
+                    <Link
+                        to="/cart"
+                        className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    >
+                        🛒 Cart
+
+                        {cartCount > 0 && (
+                        <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-bold text-white">
+                            {cartCount}
+                        </span>
+                    )}
+                    </Link>
 
                     <div className="flex items-centre gap-4">
                         {isLoggedIn ? (

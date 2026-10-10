@@ -1,4 +1,19 @@
+import { isTokenValid } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 function ProductInfo({ product, onBuyNow }) {
+
+  const navigate = useNavigate();
+
+const handleBuyNowClick = () => {
+    // First validate token
+    if (!isTokenValid()) {
+        navigate("/login");
+        return;
+    }
+
+    // Token is valid → execute Buy Now
+    onBuyNow();
+};
   return (
     <div>
 
@@ -70,10 +85,7 @@ function ProductInfo({ product, onBuyNow }) {
         </button>
 
         <button 
-        onClick={() => {
-        console.log("BUY NOW CLICKED");
-        onBuyNow();
-    }}
+        onClick={handleBuyNowClick}
         className="flex-1 rounded-lg bg-yellow-400 py-3 font-semibold text-black hover:bg-yellow-500">
           Buy Now
         </button>

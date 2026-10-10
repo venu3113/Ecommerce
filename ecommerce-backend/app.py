@@ -5,6 +5,8 @@ from config import JWT_SECRET_KEY
 from routes.auth import auth_bp
 from routes.wishlist import wishlist_bp
 from routes.orders import orders_bp
+from routes.chat import chat_bp
+from routes.cart import cart_bp
 from datetime import timedelta
 
 app = Flask(__name__)
@@ -16,6 +18,8 @@ jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(wishlist_bp)
 app.register_blueprint(orders_bp)
+app.register_blueprint(chat_bp)
+app.register_blueprint(cart_bp)
 
 @app.route("/")
 def home():

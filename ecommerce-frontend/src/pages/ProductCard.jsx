@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { addToWishlist } from "../services/wishlistService";
+import { useCart } from "../components/CartContext";
 
 function ProductCard({ product }) {
+
+  const { addToCart } = useCart();
 
   console.log("single product",product);
   
@@ -22,7 +25,44 @@ function ProductCard({ product }) {
         );
       }
     }
+    const handleAddToCart = async () => {
+  console.log("BUTTON CLICKED");
+  console.log("PRODUCT ID:", product.id);
 
+  const token = localStorage.getItem("token");
+
+  console.log("TOKEN:", token);
+
+  try {
+    const response = await fetch("http://127.0.0.1:5000/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        product_id: product.id,
+        quantity: 1,
+      }),
+    });
+
+    console.log("HTTP STATUS:", response.status);
+
+    const data = await response.json();
+
+    console.log("SERVER RESPONSE:", data);
+
+    if (response.ok) {
+      alert("Product added to cart successfully!");
+    } else {
+      alert(data.message || data.error || "Failed to add to cart");
+    }
+
+  } catch (error) {
+    console.error("FETCH ERROR:", error);
+    alert("Could not connect to backend");
+  }
+};
   return (
     <div className="group relative overflow-hidden min-w-0 rounded-xl border border-gray-200 bg-white shadow-sm p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
 
@@ -96,7 +136,7 @@ function ProductCard({ product }) {
 
         <div className="mt-4 flex items-center gap-2">
 
-          <button className="flex-1 rounded-lg border border-gray-400 bg-white-400 py-2 text-sm font-semibold hover:bg-gray-300">
+          <button onClick={handleAddToCart} className="flex-1 rounded-lg border border-gray-400 bg-white-400 py-2 text-sm font-semibold hover:bg-gray-300">
             Add to Cart
           </button>
 
